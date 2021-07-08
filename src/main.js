@@ -1,8 +1,12 @@
-import Vue from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue'
+import App from './Index.vue'
 
-Vue.config.productionTip = false
+import 'bootstrap/dist/css/bootstrap.min.css'
+import 'admin-lte/dist/css/adminlte.css'
+import '@fortawesome/fontawesome-free/css/all.min.css'
+import 'jquery/dist/jquery.min.js'
+import 'bootstrap/dist/js/bootstrap.min.js'
+import 'admin-lte/dist/js/adminlte.min.js'
 
-new Vue({
-  render: h => h(App),
-}).$mount('#app')
+
+createApp(App).mount('#app')
