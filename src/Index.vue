@@ -1,14 +1,18 @@
 <template>
-  <div id="#app">
+  <div>
     <Navbar></Navbar>
     <LeftSidebar></LeftSidebar>
-     <!-- Content Wrapper. Contains page content -->
+    <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-      <Dashboard></Dashboard>
+      <router-view v-slot="{ Component }">
+        <component :is="Component" />
+      </router-view>
+
+      <!-- <Dashboard></Dashboard> -->
     </div>
     <!-- /.content-wrapper -->
     <Footer></Footer>
-     <!-- Control Sidebar -->
+    <!-- Control Sidebar -->
     <aside class="control-sidebar control-sidebar-dark">
       <!-- Control sidebar content goes here -->
     </aside>
@@ -17,15 +21,19 @@
 </template>
 
 <script>
-import Navbar from './components/Navbar.vue'
-import LeftSidebar from './components/LeftSidebar.vue'
-import Footer from './components/Footer.vue'  
-import Dashboard from './pages/Dashboard.vue'
+import Navbar from "./components/Navbar.vue";
+import LeftSidebar from "./components/LeftSidebar.vue";
+import Footer from "./components/Footer.vue";
+// import Dashboard from "./views/Dashboard.vue";
 
 export default {
-  name: 'Index',
+  name: "Index",
   components: {
-Navbar,LeftSidebar,Dashboard,Footer
-  }
-}
+    Navbar,
+    LeftSidebar,
+    // Dashboard,
+    Footer,
+  },
+  computed: {},
+};
 </script>
