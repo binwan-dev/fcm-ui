@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="app">
     <Navbar></Navbar>
     <LeftSidebar></LeftSidebar>
     <!-- Content Wrapper. Contains page content -->
@@ -7,7 +7,7 @@
       <router-view v-slot="{ Component }">
         <component :is="Component" />
       </router-view>
-
+      
       <!-- <Dashboard></Dashboard> -->
     </div>
     <!-- /.content-wrapper -->

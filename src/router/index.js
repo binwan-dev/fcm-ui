@@ -1,11 +1,23 @@
-import VueRouter from 'vue-router'
-import Dashboard from '../views/Dashboard.vue'
+import {createRouter,createWebHashHistory} from 'vue-router';
+import Dashboard from '../views/Dashboard.vue';
+import App from '../views/App.vue';
+import AppConfig from '../views/AppConfig.vue';
 
 const routes = [
   {
     path: '/',
     name: 'Dashboard',
-    component: Dashboard
+    component: Dashboard,
+  },
+  {
+    path:'/app',
+    name:'App',
+    component:App,
+  },
+  {
+    path:'/app/config',
+    name:'AppConfig',
+    component:AppConfig
   }
   // },
   // {
@@ -16,11 +28,11 @@ const routes = [
   //   // which is lazy-loaded when the route is visited.
   //   component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
   // }
-]
+];
 
-const router = VueRouter.createRouter({
-  history: VueRouter.createWebHashHistory(),
+const router = createRouter({
+  history: createWebHashHistory(),
   routes
-})
+});
 
-export default router
+export default router;

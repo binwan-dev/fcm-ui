@@ -38,6 +38,17 @@
               </p>
             </a>
           </li>
+	  <li class="nav-item">
+	    <router-link to="/app">
+              <a href="../widgets.html" class="nav-link">
+		<!-- <i class="nav-icon fas fa-th"></i> -->
+		<p>
+                  项目
+                  <!-- <span class="right badge badge-danger">New</span> -->
+		</p>
+              </a>
+	    </router-link>
+          </li>
         </ul>
       </nav>
       <!-- /.sidebar-menu -->
