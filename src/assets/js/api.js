@@ -9,11 +9,14 @@ const Api = {
   loadAppNamespacePaged: function(param){
     return axios.get(baseHost+'/app/namespace',{params:param});
   },
-  loadAppConfigPaged: function(param){
-    return axios.get(baseHost+'/app/config',{params:param});
+  loadAppConfigs: function(param){
+    return axios.get(baseHost+'/app/namespace/config',{params:param});
   },
   loadAppForId: function(appId,param){
     return axios.get(baseHost+'/app/'+appId,{params:param});
+  },
+  modifyAppConfig:function(param){
+    return axios.put(baseHost+'/app/namespace/config',{params:param});
   }
 };
 
