@@ -1,16 +1,48 @@
-const Utils={
-  // timestampToDateStr:function(timestamp){
-  //   var datetime = new Date();
-  //   datetime.setTime(timestamp);
-  //   var year = datetime.getFullYear();
-  //   var month = datetime.getMonth() + 1;
-  //   var date = datetime.getDate();
-  //   var hour = datetime.getHours();
-  //   var minute = datetime.getMinutes();
-  //   var second = datetime.getSeconds();
-  //   var mseconds = datetime.getMilliseconds();
-  //   return year + "-" + month + "-" + date+" "+hour+":"+minute+":"+second+"."+mseconds;
-  // }
+import Swal from 'sweetalert2';
+
+const SweetToast = Swal.mixin({
+  toast: true,
+  position: 'top',
+  showConfirmButton: false,
+  timer: 2000,
+  timerProgressBar: true,
+  padding: 10,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer);
+    toast.addEventListener('mouseleave', Swal.resumeTimer);
+  }
+});
+
+const Dialog={
+  show:function(content,callback){
+    Swal.fire({
+      title: content,
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      cancelButtonText: '取消',
+      confirmButtonText: '删除'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        callback();
+      }
+    });
+  }
 };
 
-export default Utils;
+const Toast={
+  success:function(content){
+    SweetToast.fire({
+      icon: 'success',
+      title: content
+    });
+  },
+  error:function(content){
+    SweetToast.fire({
+      icon: 'error',
+      title: content
+    });
+  }
+};
+
+export {Toast,Dialog};

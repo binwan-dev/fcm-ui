@@ -9,10 +9,6 @@ import 'jquery/dist/jquery.min.js';
 import 'bootstrap/dist/js/bootstrap.min.js';
 import 'admin-lte/dist/js/adminlte.min.js';
 
-import VueSweetalert2 from 'vue-sweetalert2';
-import 'sweetalert2/dist/sweetalert2.min.css';
-
-
-createApp(Index).use(router).use(VueSweetalert2).mount('#app');
+createApp(Index).use(router).mount('#app');
 
 // createApp(App).mount('#app')

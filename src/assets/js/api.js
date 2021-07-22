@@ -15,8 +15,14 @@ const Api = {
   loadAppForId: function(appId,param){
     return axios.get(baseHost+'/app/'+appId,{params:param});
   },
-  modifyAppConfig:function(param){
-    return axios.put(baseHost+'/app/namespace/config',{params:param});
+  createAppConfig:function(data){
+    return axios.post(baseHost+'/app/namespace/config',data);
+  },
+  modifyAppConfig:function(data){
+    return axios.put(baseHost+'/app/namespace/config',data);
+  },
+  deleteAppConfig:function(data){
+    return axios.delete(baseHost+'/app/namespace/config',{params:data});
   }
 };
 

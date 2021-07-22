@@ -30,7 +30,7 @@
             <h3 class="card-title">{{ namespace.Name }}</h3>
 	    <div class="card-tools">
 	      <button type="button" class="btn btn-tool" @click="loadNamespace(namespace)"><i class="fas fa-minus"></i></button>
-	      <button class="btn btn-primary btn-sm">添加配置</button>
+	      <button class="btn btn-primary btn-sm" @click="createConfig(namespace)" data-toggle="modal" data-target="#exampleModal">添加配置</button>
 	      <button class="btn btn-danger btn-sm">删除Namespace</button>
 	    </div>
 	  </div>
@@ -44,7 +44,7 @@
 		  <td >{{ getValidTypeName(config.ValidType) }}</td>
 		  <td style="width:150px;">
 		    <button class="btn btn-primary btn-sm" type="button" @click="modifyConfig(config)" data-toggle="modal" data-target="#exampleModal">修改</button>
-		    <button class="btn btn-danger btn-sm" type="button" @click="deleteConfig(config.Id)">删除</button>
+		    <button class="btn btn-danger btn-sm" type="button" @click="deleteConfig(config)" >删除</button>
 		    
 		  </td>
 		</tr>
@@ -59,7 +59,7 @@
       <div class="modal-dialog modal-lg" role="document">
 	<div class="modal-content">
 	  <div class="modal-header">
-            <h5 class="modal-title">修改配置</h5>
+            <h5 class="modal-title">{{ dialogTitle }}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -69,13 +69,13 @@
 	      <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 col-form-label text-right">配置名</label>
                 <div class="col-sm-10">
-                  <input type="input" class="form-control" id="name" placeholder="配置名" v-model="config.Name">
+                  <input type="input" class="form-control" id="name" placeholder="配置名" v-model="currentConfig.Name">
                 </div>
               </div>
 	      <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 col-form-label text-right">生效方式</label>
                 <div class="col-sm-10">
-		  <select class="form-select" v-model="config.ValidType">
+		  <select class="form-select" v-model="currentConfig.ValidType">
 		    <option v-for="item in validTypes" :key="item" v-bind:value="item.val">{{ item.name }}</option>
 		  </select>
                 </div>
@@ -83,14 +83,14 @@
 	      <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 col-form-label text-right">配置值</label>
                 <div class="col-sm-10">
-                  <textarea class="form-control" id="data" placeholder="配置值" rows="6" v-model="config.Data"></textarea>
+                  <textarea class="form-control" id="data" placeholder="配置值" rows="6" v-model="currentConfig.Data"></textarea>
                 </div>
               </div>
 	    </form>
 	  </div>
 	  <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">取消</button>
-            <button type="button" class="btn btn-primary" @click="modifyConfigSave">保存</button>
+            <button type="button" class="btn btn-primary" @click="saveConfig" :disabled="isDisableSaveAppConfigBtn" >保存</button>
 	  </div>
 	</div>
       </div>
@@ -101,6 +101,7 @@
 <script>
 import api from '../assets/js/api'
 import {ValidType} from '../assets/js/enum'
+import {Toast,Dialog} from '../assets/js/util'
 
 export default{
   name:"AppConfig",
@@ -108,8 +109,10 @@ export default{
     return{
       appInfo:{},
       appNamespaces:{},
-      config:{},
-      validTypes:ValidType.data
+      currentConfig:{},
+      validTypes:ValidType.data,
+      dialogTitle:'',
+      isDisableSaveAppConfigBtn:false,
     }
   },
   mounted:function(){
@@ -135,18 +138,25 @@ export default{
 	  appId:appId
 	})
 	.then((res)=>{
-	  this.appNamespaces=res.data.List
-	  this.appNamespaces.forEach(e=>{
+	  res.data.List.forEach(item=>this.appNamespaces[item.Id]=item);
+	  for(let key in this.appNamespaces){
+	    let e=this.appNamespaces[key]
 	    e.collapse='collapse'
 	    e.loaded=false
-	  })
+	  }
 	})
 	.catch((err)=>{
 	  console.log(err)
 	})
     },
-    loadAppConfig:function(){
-      
+    loadAppConfig:function(namespace){
+      console.log('load')
+      api
+	     .loadAppConfigs({namespaceId:namespace.Id})
+	     .then(res=>{
+	       namespace.loaded=true
+	       namespace.Configs=res.data
+	     }).catch(err=>console.log(err))
     },
     loadNamespace:function(namespace){
       if(namespace.collapse==''){
@@ -157,39 +167,72 @@ export default{
       if(namespace.loaded){
 	return
       }
-      
-      api
-	.loadAppConfigs({namespaceId:namespace.Id})
-	.then(res=>{
-	  namespace.loaded=true
-	  namespace.Configs=res.data
-	}).catch(err=>console.log(err))
+      this.loadAppConfig(namespace)
+    },
+    createConfig:function(namespace){
+      this.dialogTitle='添加配置'
+      this.resetConfig(namespace.Id)
     },
     modifyConfig:function(config){
-      this.config=config
+      this.currentConfig=config
+      this.dialogTitle='修改配置'
       this.validTypes.forEach(item=>{
 	if(item.val==config.ValidType){
 	  item.selected='selected'
 	}
       })
     },
-    modifyConfigSave:function(){
-      this.$swal.fire({
-	text:'Hello Vue world!!!',
-	toast: true,
-	position:'top-center'
-      });
-      /* api
-	 .modifyAppConfig({this.config})
-	 .then(res=>{
-	 
-	 })
-	 .catch(err=>{
+    saveConfig:function(){
+      this.isDisableSaveAppConfigBtn=true
 
-	 }) */
+      let request={}
+      if(this.currentConfig.Id==undefined){
+	request=api
+	  .createAppConfig(this.currentConfig)
+      }else{
+	request=api
+	  .modifyAppConfig(this.currentConfig)
+      }
+      request
+	.then(()=>{
+	  Toast.success('保存成功！');
+
+	  if(this.currentConfig.Id==undefined){
+	    this.resetConfig(this.currentConfig.NamespaceId)
+	  }
+	  this.loadAppConfig(this.appNamespaces[this.currentConfig.NamespaceId])
+	})
+	.catch(()=>{
+	  Toast.error('保存失败！');
+	})
+	.finally(()=>{
+	  this.isDisableSaveAppConfigBtn=false
+	})
+
+    },
+    deleteConfig:function(config){
+      let namespace=this.appNamespaces[config.NamespaceId]
+      let loadAppConfigFn=this.loadAppConfig
+      
+      Dialog.show('确定要删除？',function(){
+	api
+	  .deleteAppConfig({id:config.Id})
+	  .then(()=>{
+	    Toast.success('删除成功！')
+	    loadAppConfigFn(namespace)
+	  })
+	  .catch((err)=>{
+	    console.log(err)
+	    Toast.error('删除失败！')
+	  })
+      })
     },
     getValidTypeName:function(validType){
       return ValidType.getForVal(validType).name
+    },
+    resetConfig:function(namespaceId){
+      this.currentConfig={}
+      this.currentConfig.NamespaceId=namespaceId
     }
   }
 }
